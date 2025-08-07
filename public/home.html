@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Note Maker</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">AI Note Maker</div>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+      <a href="#">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container">
+    <h1>📝 Convert Paragraphs into Bullet Points</h1>
+    
+    <textarea id="noteInput" placeholder="Paste your content or write summary here..."></textarea>
+    
+    <button id="generateNote">✨ Generate Bullet Points</button>
+
+    <div class="output">
+      <h2>📄 Generated Notes</h2>
+      <ul id="noteOutput"></ul>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
