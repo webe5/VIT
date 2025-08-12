@@ -4,25 +4,54 @@
   <meta charset="UTF-8">
   <title>Sign Up</title>
   <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    // Your Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6qBmDUseQCjX6uYtiMxP74f3ok6RBZCI",
+      authDomain: "ai-note-maker.firebaseapp.com",
+      projectId: "ai-note-maker",
+      storageBucket: "ai-note-maker.firebasestorage.app",
+      messagingSenderId: "157693415543",
+      appId: "1:157693415543:web:3db722cdc71b4ebdaa3672"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Sign Up Function
+    window.handleSignUp = (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Update profile with name
+          updateProfile(userCredential.user, { displayName: name });
+          alert("Signup successful!");
+          window.location.href = "home.html";
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    };
+  </script>
 </head>
 <body>
   <div class="container">
     <h2>Create an Account</h2>
     <form onsubmit="handleSignUp(event)">
-  <input type="text" placeholder="Name" id="name" required>
-  <input type="email" placeholder="Email" id="email" required>
-  <input type="password" placeholder="Password" id="password" required>
-  <button type="submit">Sign Up</button>
-</form>
-
-<script>
-  function handleSignUp(event) {
-    event.preventDefault();
-    // Optional: save data to localStorage
-    window.location.href = "home.html";
-  }
-</script>
-
+      <input type="text" placeholder="Name" id="name" required>
+      <input type="email" placeholder="Email" id="email" required>
+      <input type="password" placeholder="Password" id="password" required>
+      <button type="submit">Sign Up</button>
+    </form>
     <p>Already have an account? <a href="login.html">Login</a></p>
   </div>
 </body>

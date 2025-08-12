@@ -1,15 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Welcome</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bullet Point Extractor</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
   <div class="container">
-    <h1>Welcome to Text Bullet Point Converter</h1>
-    <a href="signup.html" class="btn">Sign Up</a>
-    <a href="login.html" class="btn">Login</a>
+    <h1>Bullet Point Extractor</h1>
+
+    <div class="card">
+      <h2>Text to Bullet Points</h2>
+      <textarea id="paragraph" placeholder="Enter your paragraph here..."></textarea>
+      <button onclick="sendText()">Convert</button>
+    </div>
+
+    <div class="card">
+      <h2>Upload Screenshot</h2>
+      <input type="file" id="imageUpload" accept="image/*"/>
+      <button onclick="uploadImage()">Upload & Convert</button>
+    </div>
+
+    <div class="output">
+      <h2>Bullet Points:</h2>
+      <pre id="output"></pre>
+    </div>
   </div>
+
+  <script>
+    async function sendText() {
+      const paragraph = document.getElementById("paragraph").value;
+      const res = await fetch("http://localhost:5000/api/text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paragraph })
+      });
+      const data = await res.json();
+      document.getElementById("output").textContent = data.bullets || "No output";
+    }
+
+    async function uploadImage() {
+      const file = document.getElementById("imageUpload").files[0];
+      if (!file) return alert("Please select an image");
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch("http://localhost:5000/api/image", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+      document.getElementById("output").textContent = data.bullets || "No output";
+    }
+  </script>
 </body>
 </html>

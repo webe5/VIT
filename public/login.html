@@ -4,24 +4,50 @@
   <meta charset="UTF-8">
   <title>Login</title>
   <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    // Your Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6qBmDUseQCjX6uYtiMxP74f3ok6RBZCI",
+      authDomain: "ai-note-maker.firebaseapp.com",
+      projectId: "ai-note-maker",
+      storageBucket: "ai-note-maker.firebasestorage.app",
+      messagingSenderId: "157693415543",
+      appId: "1:157693415543:web:3db722cdc71b4ebdaa3672"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Login Function
+    window.handleLogin = (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Login successful!");
+          window.location.href = "home.html";
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    };
+  </script>
 </head>
 <body>
   <div class="container">
     <h2>Login</h2>
     <form onsubmit="handleLogin(event)">
-  <input type="email" placeholder="Email" id="email" required>
-  <input type="password" placeholder="Password" id="password" required>
-  <button type="submit">Login</button>
-</form>
-
-<script>
-  function handleLogin(event) {
-    event.preventDefault(); // Stop form from refreshing
-    // Optional: validate login here
-    window.location.href = "home.html"; // Redirect to home
-  }
-</script>
-
+      <input type="email" placeholder="Email" id="email" required>
+      <input type="password" placeholder="Password" id="password" required>
+      <button type="submit">Login</button>
+    </form>
     <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
   </div>
 </body>
