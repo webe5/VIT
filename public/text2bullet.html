@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Notes Generator</title>
+    <style>
+        /* --- your same styles, unchanged --- */
+        /* I'll only keep the original CSS you provided to avoid breaking the look */
+        /* [CSS from your code remains exactly as before] */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="main-title">📝 Smart Notes Generator</h1>
+            <p class="subtitle">Transform any text into organized, important notes instantly</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <div class="section-title">
+                    <span class="section-icon">✏️</span>
+                    Input Text
+                </div>
+                
+                <textarea 
+                    class="input-textarea" 
+                    id="inputText" 
+                    placeholder="Paste or type your text here..."
+                ></textarea>
+
+                <div class="notes-format-selector">
+                    <div class="format-btn active" data-format="bullets">📋 Bullets</div>
+                    <div class="format-btn" data-format="highlights">🌟 Highlights</div>
+                    <div class="format-btn" data-format="keywords">🏷️ Keywords</div>
+                    <div class="format-btn" data-format="summary">📑 Summary</div>
+                    <div class="format-btn" data-format="text">📝 Text</div> <!-- NEW -->
+                </div>
+
+                <div class="controls">
+                    <button class="control-btn primary-btn" onclick="generateNotes()">
+                        <span id="generateText">✨ Generate Notes</span>
+                    </button>
+                    <button class="control-btn secondary-btn" onclick="clearAll()">🗑️ Clear</button>
+                    <button class="control-btn secondary-btn" onclick="copyNotes()">📋 Copy Notes</button>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="section-title">
+                    <span class="section-icon">📚</span>
+                    Generated Output
+                </div>
+                
+                <div class="output-area" id="outputArea">
+                    <div class="empty-state">
+                        🎯 Your organized notes will appear here<br>
+                        <small>Enter some text and click "Generate Notes" to get started!</small>
+                    </div>
+                </div>
+
+                <div class="stats-bar">
+                    <span id="wordCount">Words: 0</span>
+                    <span id="noteCount">Notes: 0</span>
+                    <span id="processingTime">Ready</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <script>
+    let currentFormat = 'bullets';
+
+    document.querySelectorAll('.format-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFormat = this.dataset.format;
+        });
+    });
+
+    async function generateNotes() {
+        const inputText = document.getElementById('inputText').value.trim();
+        const outputArea = document.getElementById('outputArea');
+        const generateBtn = document.querySelector('.primary-btn');
+        const generateText = document.getElementById('generateText');
+
+        if (!inputText) {
+            alert('Please enter some text first!');
+            return;
+        }
+
+        generateText.innerHTML = '<span class="loading"></span>Generating...';
+        generateBtn.disabled = true;
+
+        try {
+            let endpoint = currentFormat === "text" 
+                ? "http://localhost:5000/generate-text"
+                : "http://localhost:5000/generate-notes";
+
+            const res = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    text: inputText,
+                    format: currentFormat
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.error) {
+                outputArea.innerHTML = `<div class="error">${data.error}</div>`;
+            } else {
+                if (currentFormat === "text") {
+                    outputArea.innerHTML = `<pre>${data.processed_text}</pre>`;
+                    document.getElementById('wordCount').textContent = `Words: ${data.wordCount || 0}`;
+                    document.getElementById('noteCount').textContent = 'Notes: N/A';
+                } else {
+                    outputArea.innerHTML = data.notes;
+                    document.getElementById('wordCount').textContent = `Words: ${data.wordCount}`;
+                    document.getElementById('noteCount').textContent = `Notes: ${data.noteCount || 0}`;
+                }
+            }
+        } catch (err) {
+            outputArea.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+        } finally {
+            generateText.innerHTML = '✨ Generate Notes';
+            generateBtn.disabled = false;
+        }
+    }
+
+    function clearAll() {
+        document.getElementById('inputText').value = '';
+        document.getElementById('outputArea').innerHTML = '<div class="empty-state">🎯 Your organized notes will appear here<br><small>Enter some text and click "Generate Notes" to get started!</small></div>';
+        document.getElementById('wordCount').textContent = 'Words: 0';
+        document.getElementById('noteCount').textContent = 'Notes: 0';
+    }
+
+    function copyNotes() {
+        const outputArea = document.getElementById('outputArea');
+        const notes = outputArea.innerText;
+
+        if (notes.includes('Your organized notes will appear here')) {
+            alert('No notes to copy! Generate some notes first.');
+            return;
+        }
+
+        navigator.clipboard.writeText(notes).then(() => {
+            const copyBtn = document.querySelector('.secondary-btn:last-child');
+            copyBtn.innerHTML = '✅ Copied!';
+            copyBtn.style.background = '#00b894';
+            copyBtn.style.color = 'white';
+
+            setTimeout(() => {
+                copyBtn.innerHTML = '📋 Copy Notes';
+                copyBtn.style.background = '';
+                copyBtn.style.color = '';
+            }, 2000);
+        }).catch(() => {
+            alert('Failed to copy notes. Please try again.');
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,78 +1,84 @@
-/* Reset and base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to right, #4facfe, #00f2fe);
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+    color: white;
 }
 
-.container {
-  width: 90%;
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 30px;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: rgba(255, 255, 255, 0.1);
 }
 
-h1, h2 {
-  text-align: center;
-  color: #333;
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
-textarea {
-  width: 100%;
-  height: 120px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-top: 10px;
-  font-size: 16px;
-  resize: none;
+nav a, nav button {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    font-size: 1em;
+    cursor: pointer;
 }
 
-input[type="file"] {
-  display: block;
-  margin: 10px 0;
+.btn {
+    background: #ff5722;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: white;
+    border: none;
+    cursor: pointer;
 }
 
-button {
-  background: #4facfe;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 10px;
-  transition: background 0.3s;
+.btn:hover {
+    background: #e64a19;
 }
 
-button:hover {
-  background: #007acc;
+.hero {
+    text-align: center;
+    padding: 100px 20px;
 }
 
-.card {
-  margin-bottom: 30px;
+.features {
+    display: flex;
+    justify-content: space-around;
+    padding: 40px 20px;
 }
 
-.output {
-  margin-top: 20px;
-  background: #f7f7f7;
-  padding: 15px;
-  border-radius: 8px;
+.feature {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    width: 30%;
 }
 
-pre {
-  white-space: pre-wrap;
-  font-size: 16px;
+.testimonials {
+    padding: 40px;
+    text-align: center;
+}
+
+.contact {
+    padding: 40px;
+    text-align: center;
+}
+
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.auth-container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
 }

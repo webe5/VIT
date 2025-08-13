@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notera</title>
+    <style>
+       :root {
+  /* Main Palette for Visual Theme */
+  --dark-bg: #1e1e1e;
+  --light-bg: #f5f5f5;
+  --accent-orange: #ff6f3c;
+  --medium-gray: #999999;
+  --card-bg-dark: #2a2a2a;
+  --shadow-dark: rgba(0,0,0,0.4);
+  --shadow-light: rgba(0,0,0,0.2);
+
+  /* Body & container */
+  --body-bg-start: #1e1e1e;
+  --body-bg-end: #121212;
+  --container-bg: rgba(245,245,245,0.05);
+  --container-shadow: var(--shadow-light);
+
+  /* Headings */
+  --heading-color: #ffffff;
+  --heading-gradient-start: #ffffff;
+  --heading-gradient-end: var(--accent-orange);
+  --subtitle-color: var(--medium-gray);
+
+  /* Preference Box */
+  --pref-box-gradient-1: var(--accent-orange);
+  --pref-box-gradient-2: #ff8c5c;
+  --pref-box-gradient-3: #ff9b70;
+  --pref-box-gradient-4: #d95f3c;
+  --pref-box-shadow: var(--shadow-dark);
+  --shine-color: rgba(255,111,60,0.3);
+  --pref-inner-bg: #1e1e1e;
+
+  /* Preference Cards */
+  --pref-card-bg-start: #2a2a2a;
+  --pref-card-bg-end: #1e1e1e;
+  --pref-card-border: var(--accent-orange);
+  --pref-card-hover-shadow: rgba(255,111,60,0.4);
+  --pref-card-active-gradient-start: var(--accent-orange);
+  --pref-card-active-gradient-end: #d95f3c;
+  --pref-card-active-shadow: rgba(255,111,60,0.5);
+  --card-icon-color: var(--accent-orange);
+
+  /* Output area */
+  --output-bg-start: rgba(245,245,245,0.05);
+  --output-bg-end: rgba(30,30,30,0.05);
+  --output-border: rgba(255,111,60,0.2);
+  --output-glow-start: rgba(255,111,60,0.05);
+  --output-glow-end: transparent;
+
+  /* Code Section */
+  --code-bg-start: #2a2a2a;
+  --code-bg-end: #1e1e1e;
+  --code-text-color: #ffffff;
+  --code-border: rgba(255,111,60,0.3);
+  --code-top-border-start: var(--accent-orange);
+  --code-top-border-end: #d95f3c;
+  --code-title-color: var(--accent-orange);
+  --keyword-color: #ff9b70;
+  --string-color: #ffffff;
+  --comment-color: #999999;
+
+  /* Diagram */
+  --diagram-box-border: var(--accent-orange);
+  --diagram-box-bg: rgba(255,111,60,0.05);
+  --diagram-box-hover-bg: rgba(255,111,60,0.15);
+  --arrow-color: var(--accent-orange);
+
+  /* Default message */
+  --default-msg-color: var(--medium-gray);
+  --default-msg-bg-start: rgba(255,111,60,0.05);
+  --default-msg-bg-end: rgba(30,30,30,0.05);
+  --default-msg-border: var(--medium-gray);
+}
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--body-bg-start), var(--body-bg-end));
+  min-height: 100vh;
+  padding: 20px;
+  color: var(--light-bg);
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--container-bg);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 40px var(--container-shadow);
+  backdrop-filter: blur(10px);
+}
+
+/* Headings */
+h1 {
+  text-align: center;
+  color: var(--heading-color);
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  background: linear-gradient(45deg, var(--heading-gradient-start), var(--heading-gradient-end));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--subtitle-color);
+  margin-bottom: 40px;
+  font-style: italic;
+  font-size: 1.1em;
+}
+
+/* Preference Box */
+.preference-box {
+  background: linear-gradient(135deg, var(--pref-box-gradient-1), var(--pref-box-gradient-2), var(--pref-box-gradient-3), var(--pref-box-gradient-4));
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+  border-radius: 25px;
+  padding: 3px;
+  margin-bottom: 40px;
+  box-shadow: 0 15px 35px var(--pref-box-shadow), 0 5px 15px rgba(0,0,0,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.preference-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--shine-color), transparent);
+  animation: shine 3s infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Inner Preference Box */
+.preference-inner {
+  background: var(--pref-inner-bg);
+  border-radius: 22px;
+  padding: 35px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Preference Cards */
+.preference-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.preference-card {
+  background: linear-gradient(135deg, var(--pref-card-bg-start), var(--pref-card-bg-end));
+  border: 2px solid transparent;
+  border-radius: 20px;
+  padding: 25px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.preference-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, var(--pref-card-active-gradient-start), var(--pref-card-active-gradient-end));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.preference-card:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 20px 40px var(--pref-card-hover-shadow);
+  border-color: var(--pref-card-border);
+}
+
+.preference-card:hover::before { opacity: 0.1; }
+
+.preference-card.active {
+  background: linear-gradient(135deg, var(--pref-card-active-gradient-start), var(--pref-card-active-gradient-end));
+  color: var(--light-bg);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 30px var(--pref-card-active-shadow);
+}
+
+.card-icon { font-size: 3em; margin-bottom: 15px; color: var(--card-icon-color); transition: all 0.3s ease; }
+.card-title { font-size: 1.3em; font-weight: 600; margin-bottom: 8px; }
+.card-description { font-size: 0.9em; opacity: 0.8; line-height: 1.4; }
+
+/* Output Area */
+.output-area {
+  background: linear-gradient(135deg, var(--output-bg-start), var(--output-bg-end));
+  border: 2px solid var(--output-border);
+  border-radius: 20px;
+  padding: 30px;
+  min-height: 150px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.output-area::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, var(--output-glow-start) 0%, var(--output-glow-end) 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.output-area.active::before { opacity: 1; }
+
+/* Diagram */
+.diagram {
+  text-align: center;
+  padding: 20px;
+}
+
+.diagram-box {
+  display: inline-block;
+  padding: 15px 25px;
+  margin: 10px;
+  border: 2px solid var(--diagram-box-border);
+  border-radius: 15px;
+  background: var(--diagram-box-bg);
+  transition: all 0.3s ease;
+}
+
+.diagram-box:hover {
+  transform: scale(1.05);
+  background: var(--diagram-box-hover-bg);
+}
+
+.arrow {
+  font-size: 2em;
+  color: var(--arrow-color);
+  margin: 0 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Default Message */
+.default-message {
+  text-align: center;
+  color: var(--default-msg-color);
+  font-size: 1.1em;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, var(--default-msg-bg-start), var(--default-msg-bg-end));
+  border-radius: 15px;
+  border: 2px dashed var(--default-msg-border);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .preference-cards { grid-template-columns: 1fr; }
+  .card-icon { font-size: 2.5em; }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Notera📒</h1>
+        <p class="subtitle">A simplifies note maker</p>
+
+        <div class="preference-box">
+            <div class="preference-inner">
+                <div class="preference-header">
+                    <div class="preference-title">Choose Your Learning Style</div>
+                    <div class="preference-subtitle">How would you like to explore Notera?</div>
+                </div>
+
+                <div class="preference-cards">
+                    <div class="preference-card" onclick="window.location.href='text2text.html'">
+                        <div class="card-icon">📖</div>
+                        <div class="card-title">Text Documentation</div>
+                        <div class="card-description">Detailed explanations and comprehensive overview</div>
+                    </div>
+
+                    <div class="preference-card" onclick="window.location.href='text2bullet.html'">
+    <div class="card-icon">📝</div>
+    <div class="card-title">Bullet Points</div>
+    <div class="card-description">Quick facts and key features at a glance</div>
+</div>
+
+<div class="preference-card" onclick="window.location.href='text2visual.html'">
+    <div class="card-icon">🎨</div>
+    <div class="card-title">Visual Diagram</div>
+    <div class="card-description">Interactive flowchart and architecture view</div>
+</div>
+
+                </div>
+
+                <div class="output-area" id="preference-output">
+                    <div class="default-message">
+                        ✨ Select a learning style above to discover Notera! ✨<br>
+                        <small style="opacity: 0.7; margin-top: 10px; display: block;">Each option provides a unique perspective on our web-focused programming language</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+    <script>
+        function showPreference(type, element) {
+            // Remove active class from all cards
+            document.querySelectorAll('.preference-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Add active class to clicked card
+            element.classList.add('active');
+            
+            const outputArea = document.getElementById('preference-output');
+            outputArea.classList.add('active');
+            
+            switch(type) {
+                case 'text':
+                    outputArea.innerHTML = `
+                        <div style="animation: fadeIn 0.5s ease-in;">
+                            <h3 style="color: #333; margin-bottom: 15px; font-size: 1.4em;">📖 WebWeaver Language Overview</h3>
+                            <p style="line-height: 1.6; color: #555; font-size: 1.05em;">
+                                WebWeaver is designed to make web development more intuitive by combining the structure of HTML, 
+                                the styling of CSS, and the interactivity of JavaScript into a single, cohesive syntax. 
+                                The language emphasizes readability and rapid prototyping, allowing developers to create 
+                                complete web applications with less boilerplate code. Key concepts include declarative page 
+                                structure, built-in responsive design patterns, and seamless state management that adapts 
+                                to modern development workflows.
+                            </p>
+                            <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 10px; border-left: 4px solid #667eea;">
+                                <strong>Perfect for:</strong> Developers who want comprehensive understanding and detailed explanations
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'bullets':
+                    outputArea.innerHTML = `
+                        <div style="animation: fadeIn 0.5s ease-in;">
+                            <h3 style="color: #333; margin-bottom: 15px; font-size: 1.4em;">📝 WebWeaver Key Features</h3>
+                            <ul style="line-height: 1.8; color: #555; padding-left: 20px; font-size: 1.05em;">
+                                <li><strong>🔗 Unified Syntax:</strong> HTML, CSS, and JS combined seamlessly</li>
+                                <li><strong>🎯 Declarative Components:</strong> Define UI elements naturally</li>
+                                <li><strong>📱 Built-in Responsiveness:</strong> Mobile-first by default</li>
+                                <li><strong>✨ Easy Animations:</strong> Simple animation keywords and effects</li>
+                                <li><strong>🔄 State Management:</strong> Reactive data binding out of the box</li>
+                                <li><strong>⚡ Event Handling:</strong> Intuitive interaction patterns</li>
+                                <li><strong>🌐 API Integration:</strong> Built-in HTTP request handling</li>
+                                <li><strong>🔥 Hot Reloading:</strong> Instant development feedback</li>
+                            </ul>
+                            <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 10px; border-left: 4px solid #667eea;">
+                                <strong>Perfect for:</strong> Quick reference and feature comparison
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'visual':
+                    outputArea.innerHTML = `
+                        <div style="animation: fadeIn 0.5s ease-in;">
+                            <h3 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 1.4em;">🎨 WebWeaver Architecture Flow</h3>
+                            <div class="diagram">
+                                <div class="diagram-box" style="background: linear-gradient(135deg, #ff9a9e, #fecfef);">📝 WebWeaver Code</div>
+                                <span class="arrow">⬇️</span>
+                                <br>
+                                <div class="diagram-box" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">🔄 Parser & Compiler</div>
+                                <span class="arrow">⬇️</span>
+                                <br>
+                                <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; margin: 20px 0;">
+                                    <div class="diagram-box" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">🎨 CSS</div>
+                                    <span class="arrow">+</span>
+                                    <div class="diagram-box" style="background: linear-gradient(135deg, #a8edea, #fed6e3);">📄 HTML</div>
+                                    <span class="arrow">+</span>
+                                    <div class="diagram-box" style="background: linear-gradient(135deg, #ffd89b, #19547b);">⚡ JavaScript</div>
+                                </div>
+                                <span class="arrow">⬇️</span>
+                                <br>
+                                <div class="diagram-box" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; font-weight: bold;">🌐 Live Web Application</div>
+                            </div>
+                            <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 10px; border-left: 4px solid #667eea;">
+                                <strong>Perfect for:</strong> Visual learners who prefer diagrams and flowcharts
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+        
+        // Add CSS animation for fadeIn
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeSection = document.querySelector('.code-section pre');
+            if (codeSection) {
+                codeSection.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.transition = 'transform 0.3s ease';
+                });
+                
+                codeSection.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

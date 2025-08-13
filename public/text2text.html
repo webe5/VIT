@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI NoteMate - Text Summarizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    /* General Reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #333131 0%, #080f16 50%, #050201 100%);
+        min-height: 100vh;
+        padding: 20px;
+        color: #333;
+    }
+
+    .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        background: rgba(52, 45, 45, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        min-height: 70vh;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #f64e00,#da6b0a, #a8640b);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        min-height: 700px;
+    }
+
+    .input-section, .output-section {
+        background: #ffffff;
+        padding: 30px;
+    }
+
+    .input-section {
+        border-right: 2px solid #e9ecef;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    textarea {
+        width: 100%;
+        height: 250px;
+        padding: 20px;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        resize: vertical;
+        transition: all 0.3s ease;
+        background: white;
+        color: #2c3e50;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: #ff7c01;
+        box-shadow: 0 0 20px rgba(52, 152, 219, 0.1);
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #ffcb76, #db5800);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+    }
+
+    .diagram-container {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        min-height: 450px;
+        background: white;
+        padding: 20px;
+        overflow: auto;
+    }
+
+    .message-box {
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        display: none;
+    }
+
+    .message-box.show {
+        display: block;
+    }
+
+    .message-box.error {
+        background-color: #fdf2f2;
+        border: 4px solid #e74c3c;
+        color: #e74c3c;
+    }
+
+    .message-box.success {
+        background-color: #f0f9f4;
+        border: 4px solid #27ae60;
+        color: #27ae60;
+    }
+
+    @media (max-width: 768px) {
+        .content {
+            grid-template-columns: 1fr;
+        }
+
+        .input-section {
+            border-right: none;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>AI NoteMate: Text Summarizer</h1>
+            <p>Paste your text below and let AI NoteMate summarize it for you!</p>
+        </header>
+
+        <div class="content">
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-pencil-alt"></i> Your Text
+                </h2>
+                <textarea id="inputText" placeholder="Enter text to summarize... (e.g., an article, meeting notes, research abstract)"></textarea>
+            </div>
+
+            <div class="control-panel">
+                <button class="summarize-btn" id="summarizeBtn">
+                    <i class="fas fa-magic"></i> Summarize Text
+                </button>
+                <div class="loading-spinner" id="loadingSpinner"></div>
+            </div>
+
+            <div class="output-section">
+                <h2 class="section-title">
+                    <i class="fas fa-lightbulb"></i> Summary
+                </h2>
+                <div class="output-area" id="outputSummary">
+                    Your summarized text will appear here.
+                </div>
+                <div class="message-box" id="messageBox"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputTextarea = document.getElementById('inputText');
+        const summarizeBtn = document.getElementById('summarizeBtn');
+        const outputSummary = document.getElementById('outputSummary');
+        const messageBox = document.getElementById('messageBox');
+
+        function showMessage(message, type = 'error') {
+            messageBox.textContent = message;
+            messageBox.className = `message-box show ${type}`;
+        }
+
+        function hideMessage() {
+            messageBox.className = 'message-box';
+            messageBox.textContent = '';
+        }
+
+        summarizeBtn.addEventListener('click', async () => {
+            const userText = inputTextarea.value.trim();
+
+            if (userText.length === 0) {
+                showMessage('Please enter some text to summarize.', 'error');
+                return;
+            }
+
+            hideMessage();
+            outputSummary.textContent = 'Summarizing...';
+            summarizeBtn.disabled = true;
+
+            try {
+                const res = await fetch("http://127.0.0.1:5000/text2text", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: userText })
+                });
+
+                if (!res.ok) throw new Error("Failed to connect to backend");
+
+                const data = await res.json();
+                outputSummary.textContent = data.response || "No summary received.";
+                showMessage('Summary generated successfully!', 'success');
+            } catch (error) {
+                console.error(error);
+                showMessage('Error: Could not summarize text. Is backend running?', 'error');
+                outputSummary.textContent = '';
+            } finally {
+                summarizeBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

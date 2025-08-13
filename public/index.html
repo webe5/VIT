@@ -1,60 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bullet Point Extractor</title>
-  <link rel="stylesheet" href="styles.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Note maker</title>
+    <style>
+        /* Color Palette */
+/* Color Palette */
+/* Color Palette */
+:root {
+  --olive-green: #606C38;
+  --dark-olive-green: #283618;
+  --cream: #FEFAE0;
+  --tan: #DDA15E;
+  --dark-tan: #BC6C25;
+  --dark-background: #0a0a0b; /* Keeping the original dark background for contrast */
+  --text-color: var(--cream);
+  --link-color: var(--cream);
+  --border-color: rgba(254, 250, 224, 0.1);
+  --button-hover-bg: rgba(254, 250, 224, 0.15);
+  --button-hover-border: rgba(254, 250, 224, 0.3);
+  --notification-bg: rgba(254, 250, 224, 0.05);
+  --pro-badge-bg: var(--olive-green);
+  --pro-badge-text: var(--dark-olive-green);
+  --card-bg: rgba(0, 0, 0, 0.8);
+  --card-shadow: rgba(0, 0, 0, 0.5);
+  --text-fade-color: rgba(254, 250, 224, 0.7);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--dark-background);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+/* Header */
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 20px 40px;
+  background: rgba(10, 10, 11, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--tan) 0%, var(--dark-tan) 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--text-color);
+  font-size: 18px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--link-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--tan);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.lang-switcher {
+  display: flex;
+  gap: 8px;
+}
+
+.lang-switcher span {
+  color: rgba(254, 250, 224, 0.6);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.lang-switcher span.active,
+.lang-switcher span:hover {
+  color: var(--text-color);
+}
+
+.start-free-btn {
+  background: var(--button-hover-bg);
+  border: 1px solid var(--button-hover-border);
+  color: var(--text-color);
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.start-free-btn:hover {
+  background: var(--button-hover-bg);
+  border-color: var(--button-hover-border);
+}
+
+/* Main Content */
+.main-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Notification Banner */
+.notification-banner {
+  background: var(--notification-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  backdrop-filter: blur(20px);
+}
+
+.notification-icon {
+  width: 20px;
+  height: 20px;
+  background: var(--pro-badge-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.pro-badge {
+  background: var(--pro-badge-bg);
+  color: var(--pro-badge-text);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Hero Section */
+.hero-title {
+  font-size: 4.5rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  margin-top: 80px;
+  background: linear-gradient(135deg, var(--cream) 0%, var(--tan) 50%, var(--dark-tan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  max-width: 900px;
+}
+.hero-tit {
+  font-size: 2.5rem;
+  font-weight: 550;
+  text-align: center;
+  line-height: 1.1;
+  margin-top: 30px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--cream) 0%, var(--tan) 50%, var(--dark-tan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  max-width: 900px;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-fade-color);
+  text-align: center;
+  margin-bottom: 40px;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* Email Signup */
+/* Container for buttons */
+.cta-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 60px;
+  max-width: 400px;
+  padding-left: 50px;
+  width: 100%;
+}
+
+/* Common button style */
+.cta-button {
+  flex: 1;
+  background: linear-gradient(135deg, var(--tan) 0%, var(--dark-tan) 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 16px 24px;
+  color: var(--text-color);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(221, 161, 94, 0.3);
+  text-align: center;
+  text-decoration: none;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(221, 161, 94, 0.4);
+}
+
+.cta-button.signup {
+  background: linear-gradient(135deg, var(--tan) 0%, var(--dark-tan) 100%);
+}
+
+.cta-button.login {
+  background: linear-gradient(135deg, var(--dark-tan) 0%, var(--tan) 100%);
+}
+
+/* Dashboard Preview */
+.dashboard-preview {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: 600px;
+  perspective: 1000px;
+}
+
+.planet-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+}
+
+.planet {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(96, 108, 56, 0.8) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(40, 54, 24, 0.6) 0%, transparent 50%),
+    linear-gradient(135deg, #1a1a1b 0%, #2a2a2b 100%);
+  box-shadow:
+    0 0 100px rgba(96, 108, 56, 0.3),
+    inset 0 0 100px rgba(0, 0, 0, 0.8);
+  animation: rotate 20s linear infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Stock Prices Cards */
+.price-card {
+  position: absolute;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(30px);
+  transition: all 0.3s ease;
+}
+
+.price-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px var(--card-shadow);
+}
+
+.price-card-left {
+  top: 20%;
+  left: 0;
+  width: 240px;
+}
+
+.price-card-right {
+  top: 20%;
+  right: 0;
+  width: 200px;
+}
+
+.card-header {
+  color: rgba(254, 250, 224, 0.6);
+  font-size: 14px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.chart-point:nth-child(2) { height: 60px; animation-delay: 0.2s; }
+.chart-point:nth-child(3) { height: 80px; animation-delay: 0.4s; }
+.chart-point:nth-child(4) { height: 45px; animation-delay: 0.6s; }
+.chart-point:nth-child(5) { height: 70px; animation-delay: 0.8s; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 3.5rem;
+  }
+
+  .dashboard-preview {
+    height: 500px;
+  }
+
+  .planet-container {
+    width: 300px;
+    height: 300px;
+  }
+
+  .price-card-left,
+  .price-card-right {
+    position: static;
+    margin: 20px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .email-signup {
+    flex-direction: column;
+  }
+
+  header,
+  .main-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Bullet Point Extractor</h1>
+    <header>
+        <nav>
+            <div class="logo">
+                <div class="logo-icon">L</div>
+                Notira
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#technology">Subscription</a></li>
+                <li><a href="#features">Features</a></li>
+                
+            </ul>
+            <div class="nav-right">
+                <div class="lang-switcher">
+                    <span class="active">En</span>
+                    <span>Fr</span>
+                </div>
+                <a href="#" class="start-free-btn">Start Free</a>
+            </div>
+        </nav>
+    </header>
 
-    <div class="card">
-      <h2>Text to Bullet Points</h2>
-      <textarea id="paragraph" placeholder="Enter your paragraph here..."></textarea>
-      <button onclick="sendText()">Convert</button>
-    </div>
+    <main class="main-container">
+        <div class="notification-banner">
+            <div class="notification-icon">⚡</div>
+            <span>Fast learning - smart investments</span>
+            <div class="pro-badge">Pro</div>
+        </div>
 
-    <div class="card">
-      <h2>Upload Screenshot</h2>
-      <input type="file" id="imageUpload" accept="image/*"/>
-      <button onclick="uploadImage()">Upload & Convert</button>
-    </div>
+        <h1 class="hero-title">
+          Stop taking notes. Start taking control.
+        </h1>
+        <h2 class="hero-tit">
+           Notira converts any online content into ready-to-use summaries and visual notes.
+        </h2>
 
-    <div class="output">
-      <h2>Bullet Points:</h2>
-      <pre id="output"></pre>
-    </div>
-  </div>
+        <p class="hero-subtitle">
+            Turn Ideas into Organized Notes — Instantly, Intelligently.
+        </p>
 
-  <script>
-    async function sendText() {
-      const paragraph = document.getElementById("paragraph").value;
-      const res = await fetch("http://localhost:5000/api/text", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paragraph })
-      });
-      const data = await res.json();
-      document.getElementById("output").textContent = data.bullets || "No output";
+      
+
+        <div class="cta-buttons">
+    <a href="signup.html?form=signup" class="cta-button signup">Sign Up</a>
+    <a href="signup.html?form=login" class="cta-button login">Login</a>
+</div>
+
+
+
+
+        <div class="dashboard-preview">
+            <div class="price-card price-card-left">
+
+            <div class="planet-container">
+                <div class="planet"></div>
+                <div class="chart-points">
+                    <div class="chart-point"></div>
+                    <div class="chart-point"></div>
+                    <div class="chart-point"></div>
+                    <div class="chart-point"></div>
+                    <div class="chart-point"></div>
+                </div>
+              </div>
+        </div>
+    </main>
+
+    <script>
+        // Enhanced planet rotation with mouse interaction
+        document.addEventListener('mousemove', (e) => {
+            const planet = document.querySelector('.planet');
+            const rect = planet.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const mouseX = e.clientX - centerX;
+            const mouseY = e.clientY - centerY;
+            
+            const rotateX = (mouseY / rect.height) * 10;
+            const rotateY = (mouseX / rect.width) * 10;
+            
+            planet.style.transform = `rotateX(${-rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        // Reset planet rotation when mouse leaves
+        document.addEventListener('mouseleave', () => {
+            const planet = document.querySelector('.planet');
+            planet.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        });
+
+    window.onload = function () {
+        const params = new URLSearchParams(window.location.search);
+        const formType = params.get("form");
+
+        if (formType === "login") {
+            document.getElementById("login-form").style.display = "block";
+            document.getElementById("signup-form").style.display = "none";
+        } 
+        else if (formType === "signup") {
+            document.getElementById("signup-form").style.display = "block";
+            document.getElementById("login-form").style.display = "none";
+        }
     }
 
-    async function uploadImage() {
-      const file = document.getElementById("imageUpload").files[0];
-      if (!file) return alert("Please select an image");
 
-      const formData = new FormData();
-      formData.append("image", file);
+        // Update prices every 3 seconds
+        setInterval(animatePrices, 3000);
 
-      const res = await fetch("http://localhost:5000/api/image", {
-        method: "POST",
-        body: formData
-      });
+        // Email input focus effect
+        const emailInput = document.querySelector('.email-input');
+        emailInput.addEventListener('focus', () => {
+            emailInput.style.boxShadow = '0 0 0 3px rgba(255, 107, 53, 0.1)';
+        });
 
-      const data = await res.json();
-      document.getElementById("output").textContent = data.bullets || "No output";
-    }
-  </script>
+        emailInput.addEventListener('blur', () => {
+            emailInput.style.boxShadow = 'none';
+        });
+
+        // Join button click animation
+        const joinBtn = document.querySelector('.join-btn');
+        joinBtn.addEventListener('click', () => {
+            joinBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                joinBtn.style.transform = 'scale(1)';
+            }, 150);
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Price cards hover effect
+        document.querySelectorAll('.price-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px)';
+                card.style.boxShadow = '0 30px 60px rgba(0, 0, 0, 0.6)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.5)';
+            });
+        });
+
+        // Initialize animations on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fade in animation for main elements
+            const elements = document.querySelectorAll('.hero-title, .hero-subtitle, .email-signup, .dashboard-preview');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    el.style.transition = 'all 0.8s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
 </body>
 </html>

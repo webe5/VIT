@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Diagram Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #333131 0%, #080f16 50%, #050201 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(52, 45, 45, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f64e00,#da6b0a, #a8640b);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 700px;
+        }
+
+        .input-section {
+           /* background: linear-gradient(135deg, #f56504,#da6b0a, #a8640b);*/
+            padding: 30px;
+            background: #ffffff;
+            border-right: 2px solid #e9ecef;
+        }
+
+        .output-section {
+            background: #ffffff;
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            background: #e47f05;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #ff7c01;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.1);
+        }
+
+        .ai-suggestion {
+            background: linear-gradient(135deg, #f8ce00 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+            display: none;
+        }
+
+        .ai-suggestion.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .diagram-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .diagram-type {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .diagram-type:hover {
+            border-color: #ff9900;
+            background: #f8f9fa;
+        }
+
+        .diagram-type.active {
+            border-color: #ffcb76;
+            background: #c5560c;
+            color: white;
+        }
+
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffcb76, #db5800);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: #ffbf82;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #d57309;
+            transform: translateY(-2px);
+        }
+
+        .diagram-container {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            min-height: 450px;
+            background: white;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 350px;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #27ae60;
+            background: #f0f9f4;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+            margin: 10px 0;
+        }
+
+        .templates {
+            margin-top: 20px;
+        }
+
+        .template-btn {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 12px;
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .template-btn:hover {
+            background: #d5dbdb;
+        }
+
+        .code-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .stats {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-section {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎨 AI Diagram Generator</h1>
+            <p>Transform any text into beautiful diagrams - Flowcharts, Mind Maps, Timelines & More!</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    Input Text
+                </h2>
+                
+                <textarea id="inputText" placeholder="Paste any text here and I'll turn it into somethings you will never forget!!"></textarea>
+
+                <div id="aiSuggestion" class="ai-suggestion">
+                    🤖 <strong>AI Suggestion:</strong> <span id="suggestionText"></span>
+                </div>
+
+                <div class="diagram-types">
+                    <div class="diagram-type active" data-type="auto" title="Let AI choose the best diagram">
+                        🤖<br>Auto
+                    </div>
+                    <div class="diagram-type" data-type="flowchart" title="Process flows and workflows">
+                        📊<br>Flowchart
+                    </div>
+                    <div class="diagram-type" data-type="mindmap" title="Mind maps and concept maps">
+                        🧠<br>Mind Map
+                    </div>
+                    <div class="diagram-type" data-type="timeline" title="Timelines and sequences">
+                        📅<br>Timeline
+                    </div>
+                    <div class="diagram-type" data-type="orgchart" title="Organizational charts">
+                        🏢<br>Org Chart
+                    </div>
+                    <div class="diagram-type" data-type="cycle" title="Cycles and loops">
+                        🔄<br>Cycle
+                    </div>
+                    <div class="diagram-type" data-type="comparison" title="Comparisons and vs charts">
+                        ⚖️<br>Compare
+                    </div>
+                    <div class="diagram-type" data-type="hierarchy" title="Hierarchical structures">
+                        🌳<br>Hierarchy
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="generateDiagram()">
+                        ⚡ Generate Diagram
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearAll()">
+                        🗑️ Clear
+                    </button>
+                    <button class="btn btn-secondary" onclick="copyCode()">
+                        📋 Copy Code
+                    </button>
+                </div>
+
+                <div class="templates">
+                    <h3 style="margin-bottom: 10px; color: #2c3e50;">📋 Example Templates:</h3>
+                    <button class="template-btn" onclick="loadTemplate('process')">
+                        📊 Business Process - Order fulfillment workflow
+                    </button>
+                    <button class="template-btn" onclick="loadTemplate('mindmap')">
+                        🧠 Mind Map - Digital marketing strategy
+                    </button>
+                    <button class="template-btn" onclick="loadTemplate('timeline')">
+                        📅 Timeline - Project development phases
+                    </button>
+                    <button class="template-btn" onclick="loadTemplate('orgchart')">
+                        🏢 Organization - Company structure
+                    </button>
+                    <button class="template-btn" onclick="loadTemplate('comparison')">
+                        ⚖️ Comparison - Product features analysis
+                    </button>
+                </div>
+
+                <div id="stats" class="stats" style="display: none;">
+                    <strong>Diagram Analysis:</strong><br>
+                    <span id="diagramInfo"></span>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h2 class="section-title">
+                    <span class="icon">🎨</span>
+                    Generated Diagram
+                </h2>
+
+                <div id="messages"></div>
+
+                <div id="diagramContainer" class="diagram-container">
+                    <div class="mermaid" id="mermaidDiagram">
+                        <div style="text-align: center; color: #7f8c8d; font-style: italic; padding: 50px;">
+                            🎨 Your AI-generated diagram will appear here...<br><br>
+                            <small>Paste some text and let AI choose the perfect visualization!</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="codeOutput" class="code-output" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: { useMaxWidth: true, htmlLabels: true },
+            mindmap: { useMaxWidth: true },
+            timeline: { useMaxWidth: true },
+            gitgraph: { useMaxWidth: true }
+        });
+
+        let generatedCode = '';
+        let selectedDiagramType = 'auto';
+
+        // Diagram type selection
+        document.querySelectorAll('.diagram-type').forEach(type => {
+            type.addEventListener('click', () => {
+                document.querySelectorAll('.diagram-type').forEach(t => t.classList.remove('active'));
+                type.classList.add('active');
+                selectedDiagramType = type.dataset.type;
+                
+                if (selectedDiagramType !== 'auto') {
+                    document.getElementById('aiSuggestion').classList.remove('show');
+                }
+            });
+        });
+
+        // AI suggestion system
+        document.getElementById('inputText').addEventListener('input', (e) => {
+            const text = e.target.value;
+            if (text.length > 50 && selectedDiagramType === 'auto') {
+                const suggestion = detectBestDiagramType(text);
+                showAISuggestion(suggestion);
+            }
+        });
+
+        function detectBestDiagramType(text) {
+            const lower = text.toLowerCase();
+            
+            // Timeline indicators
+            if (/(january|february|march|april|may|june|july|august|september|october|november|december|\d{4}|first|second|third|then|next|after|before|timeline|chronolog|history)/g.test(lower)) {
+                return { type: 'timeline', reason: 'detected dates and sequence words' };
+            }
+            
+            // Mind map indicators  
+            if (/(includes|consists of|types of|categories|branches|aspects|elements|components|parts of)/g.test(lower)) {
+                return { type: 'mindmap', reason: 'detected categorization and hierarchical concepts' };
+            }
+            
+            // Org chart indicators
+            if (/(ceo|cto|manager|director|reports to|department|team|organization|company structure)/g.test(lower)) {
+                return { type: 'orgchart', reason: 'detected organizational roles and structure' };
+            }
+            
+            // Comparison indicators
+            if (/(vs|versus|compared to|difference|advantage|disadvantage|better|worse|pros|cons)/g.test(lower)) {
+                return { type: 'comparison', reason: 'detected comparison language' };
+            }
+            
+            // Cycle indicators
+            if (/(cycle|circular|loop|repeat|continuous|recurring|iterative|back to)/g.test(lower)) {
+                return { type: 'cycle', reason: 'detected cyclical or repetitive process' };
+            }
+            
+            // Process/flowchart (default for sequential content)
+            if (/(when|then|if|first|second|step|process|workflow|procedure|algorithm)/g.test(lower)) {
+                return { type: 'flowchart', reason: 'detected sequential process or decision logic' };
+            }
+            
+            return { type: 'flowchart', reason: 'general content - flowchart works well for most cases' };
+        }
+
+        function showAISuggestion(suggestion) {
+            const aiSuggestion = document.getElementById('aiSuggestion');
+            const suggestionText = document.getElementById('suggestionText');
+            
+            const typeNames = {
+                flowchart: '📊 Flowchart',
+                mindmap: '🧠 Mind Map', 
+                timeline: '📅 Timeline',
+                orgchart: '🏢 Organization Chart',
+                comparison: '⚖️ Comparison Chart',
+                cycle: '🔄 Cycle Diagram'
+            };
+            
+            suggestionText.innerHTML = `I recommend a <strong>${typeNames[suggestion.type]}</strong> because I ${suggestion.reason}.`;
+            aiSuggestion.classList.add('show');
+        }
+
+        function generateDiagram() {
+            const inputText = document.getElementById('inputText').value.trim();
+            
+            if (!inputText) {
+                showMessage('Please enter some text to generate a diagram.');
+                return;
+            }
+
+            try {
+                const diagramType = selectedDiagramType === 'auto' ? 
+                    detectBestDiagramType(inputText).type : selectedDiagramType;
+                
+                generatedCode = generateDiagramCode(inputText, diagramType);
+                renderDiagram(generatedCode, diagramType);
+                
+                showMessage(`Generated ${getDiagramTypeName(diagramType)} successfully!`, 'success');
+                showStats(diagramType, inputText);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage(`Error: ${error.message}`);
+            }
+        }
+
+        function generateDiagramCode(text, type) {
+            switch (type) {
+                case 'flowchart':
+                    return generateFlowchart(text);
+                case 'mindmap':
+                    return generateMindMap(text);
+                case 'timeline':
+                    return generateTimeline(text);
+                case 'orgchart':
+                    return generateOrgChart(text);
+                case 'comparison':
+                    return generateComparison(text);
+                case 'cycle':
+                    return generateCycle(text);
+                case 'hierarchy':
+                    return generateHierarchy(text);
+                default:
+                    return generateFlowchart(text);
+            }
+        }
+
+        function generateFlowchart(text) {
+            // Enhanced flowchart generation (similar to previous version)
+            const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+            let code = 'flowchart TD\n';
+            let nodeId = 65;
+            const nodeMap = new Map();
+            
+            sentences.forEach((sentence, i) => {
+                const process = extractProcess(sentence.trim());
+                if (process && process.length > 5) {
+                    const id = String.fromCharCode(nodeId++);
+                    const label = process.length > 40 ? process.substring(0, 37) + '...' : process;
+                    
+                    if (process.toLowerCase().includes('if') || process.includes('?')) {
+                        code += `    ${id}{${label}}\n`;
+                    } else {
+                        code += `    ${id}[${label}]\n`;
+                    }
+                    
+                    nodeMap.set(id, process);
+                    
+                    if (i > 0) {
+                        const prevId = String.fromCharCode(nodeId - 2);
+                        if (nodeMap.has(prevId)) {
+                            code += `    ${prevId} --> ${id}\n`;
+                        }
+                    }
+                }
+            });
+            
+            return code;
+        }
+
+        function generateMindMap(text) {
+            const sentences = text.match(/[^.!?]+[.!?]+/g) || [text.split(/[,;]/)];
+            let code = 'mindmap\n  root((Central Topic))\n';
+            
+            sentences.forEach((sentence, i) => {
+                const concept = extractConcept(sentence.trim());
+                if (concept && concept.length > 3) {
+                    const cleanConcept = concept.length > 25 ? concept.substring(0, 22) + '...' : concept;
+                    code += `    ${cleanConcept}\n`;
+                }
+            });
+            
+            return code;
+        }
+
+        function generateTimeline(text) {
+            const timePattern = /(\d{4}|january|february|march|april|may|june|july|august|september|october|november|december|first|second|third|then|next|after)/gi;
+            const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+            
+            let code = 'timeline\n    title Project Timeline\n';
+            
+            sentences.forEach(sentence => {
+                const event = extractEvent(sentence.trim());
+                if (event && event.length > 5) {
+                    const cleanEvent = event.length > 30 ? event.substring(0, 27) + '...' : event;
+                    code += `    section ${cleanEvent}\n`;
+                }
+            });
+            
+            return code;
+        }
+
+        function generateOrgChart(text) {
+            let code = 'flowchart TD\n';
+            const roles = extractRoles(text);
+            let nodeId = 65;
+            
+            roles.forEach((role, i) => {
+                const id = String.fromCharCode(nodeId++);
+                const cleanRole = role.length > 25 ? role.substring(0, 22) + '...' : role;
+                code += `    ${id}[${cleanRole}]\n`;
+                
+                if (i > 0) {
+                    const parentId = String.fromCharCode(65); // Connect to first node
+                    code += `    ${parentId} --> ${id}\n`;
+                }
+            });
+            
+            return code;
+        }
+
+        function generateComparison(text) {
+            const items = extractComparisonItems(text);
+            let code = 'flowchart LR\n';
+            
+            if (items.length >= 2) {
+                code += `    A[${items[0]}]\n    B[${items[1]}]\n`;
+                code += `    A -.vs.- B\n`;
+                
+                items.slice(2).forEach((item, i) => {
+                    const id = String.fromCharCode(67 + i);
+                    code += `    ${id}[${item}]\n`;
+                });
+            }
+            
+            return code;
+        }
+
+        function generateCycle(text) {
+            const steps = extractCycleSteps(text);
+            let code = 'flowchart LR\n';
+            let nodeId = 65;
+            
+            steps.forEach((step, i) => {
+                const id = String.fromCharCode(nodeId++);
+                const cleanStep = step.length > 20 ? step.substring(0, 17) + '...' : step;
+                code += `    ${id}[${cleanStep}]\n`;
+                
+                if (i > 0) {
+                    const prevId = String.fromCharCode(nodeId - 2);
+                    code += `    ${prevId} --> ${id}\n`;
+                }
+            });
+            
+            // Close the cycle
+            if (steps.length > 1) {
+                const firstId = String.fromCharCode(65);
+                const lastId = String.fromCharCode(nodeId - 1);
+                code += `    ${lastId} --> ${firstId}\n`;
+            }
+            
+            return code;
+        }
+
+        function generateHierarchy(text) {
+            return generateFlowchart(text); // Similar to flowchart but with hierarchy
+        }
+
+        // Helper functions for content extraction
+        function extractProcess(sentence) {
+            return sentence.replace(/^(when|if|then|after|before|once)\s+/i, '').trim();
+        }
+
+        function extractConcept(sentence) {
+            const keywords = sentence.split(/\s+/).filter(word => 
+                word.length > 3 && !/^(the|and|or|but|in|on|at|to|for|of|with|by)$/i.test(word)
+            );
+            return keywords.slice(0, 3).join(' ');
+        }
+
+        function extractEvent(sentence) {
+            return sentence.replace(/^\d{4}\s*-?\s*/, '').trim();
+        }
+
+        function extractRoles(text) {
+            const rolePattern = /(ceo|cto|cfo|manager|director|lead|head|supervisor|coordinator|analyst|developer|designer)/gi;
+            const matches = text.match(rolePattern) || [];
+            return [...new Set(matches)];
+        }
+
+        function extractComparisonItems(text) {
+            const items = text.split(/\s+(?:vs|versus|compared to|and)\s+/i);
+            return items.map(item => item.trim().substring(0, 20));
+        }
+
+        function extractCycleSteps(text) {
+            const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+            return sentences.map(s => extractProcess(s.trim())).filter(s => s.length > 5);
+        }
+
+        async function renderDiagram(code, type) {
+            const mermaidDiv = document.getElementById('mermaidDiagram');
+            const codeOutput = document.getElementById('codeOutput');
+            
+            try {
+                mermaidDiv.innerHTML = '';
+                const { svg } = await mermaid.render('generatedDiagram', code);
+                mermaidDiv.innerHTML = svg;
+                
+                codeOutput.textContent = code;
+                codeOutput.style.display = 'block';
+                
+            } catch (error) {
+                throw new Error(`Failed to render ${type}: ${error.message}`);
+            }
+        }
+
+        function getDiagramTypeName(type) {
+            const names = {
+                flowchart: 'Flowchart',
+                mindmap: 'Mind Map',
+                timeline: 'Timeline', 
+                orgchart: 'Organization Chart',
+                comparison: 'Comparison Chart',
+                cycle: 'Cycle Diagram',
+                hierarchy: 'Hierarchy Chart'
+            };
+            return names[type] || 'Diagram';
+        }
+
+        function showStats(type, text) {
+            const statsDiv = document.getElementById('stats');
+            const info = document.getElementById('diagramInfo');
+            
+            info.innerHTML = `
+                Type: ${getDiagramTypeName(type)}<br>
+                Input length: ${text.length} characters<br>
+                Generated: ${new Date().toLocaleTimeString()}
+            `;
+            
+            statsDiv.style.display = 'block';
+        }
+
+        function showMessage(message, type = 'error') {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => messagesDiv.innerHTML = '', 5000);
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('mermaidDiagram').innerHTML = `
+                <div style="text-align: center; color: #7f8c8d; font-style: italic; padding: 50px;">
+                    🎨 Your notes diagram will appear here...<br><br>
+                    <small>Paste some text and let me choose the perfect visualization!</small>
+                </div>`;
+            document.getElementById('codeOutput').style.display = 'none';
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('aiSuggestion').classList.remove('show');
+            generatedCode = '';
+        }
+
+        function copyCode() {
+            if (!generatedCode) {
+                showMessage('No code to copy. Please generate a diagram first.');
+                return;
+            }
+            navigator.clipboard.writeText(generatedCode).then(() => {
+                showMessage('Code copied to clipboard!', 'success');
+            });
+        }
+
+        function loadTemplate(type) {
+            const templates = {
+                process: `When a customer places an order online, the system first validates their payment information and billing address. Then it automatically checks the inventory database for product availability. If the requested items are in stock, the order processing begins immediately and the system generates a shipping label. The warehouse team picks and packages the items, then ships them to the customer. However, if any items are out of stock, the system sends a backorder notification to the customer with an estimated restock date.`,
+
+                mindmap: `Digital marketing strategy includes several key components that work together to build brand awareness and drive conversions. Search engine optimization focuses on improving organic visibility through keyword research and content optimization. Social media marketing leverages platforms like Facebook, Instagram, and LinkedIn to engage with target audiences. Email marketing nurtures leads through personalized campaigns and automated sequences. Content marketing creates valuable resources like blogs, videos, and infographics. Pay-per-click advertising provides immediate visibility through Google Ads and social media ads.`,
+
+                timeline: `The mobile app development project began in January 2023 with the initial planning and requirements gathering phase. In February, the design team created wireframes and user interface mockups. March focused on setting up the development environment and architecture. The core development phase started in April and continued through June. July was dedicated to comprehensive testing and bug fixes. In August, we conducted beta testing with selected users. The app was finally launched to the public in September 2023, followed by ongoing maintenance and feature updates.`,
+
+                orgchart: `TechCorp has a hierarchical organizational structure led by the Chief Executive Officer who oversees all operations. The Chief Technology Officer reports directly to the CEO and manages the engineering department. Under the CTO, there are three engineering managers who each lead teams of software developers. The company also has a Chief Financial Officer who manages the finance and accounting departments. The Chief Marketing Officer heads the marketing and sales teams, with separate managers for digital marketing and business development.`,
+
+                comparison: `When comparing iPhone versus Android smartphones, several key differences emerge. iPhone offers a more integrated ecosystem with seamless connectivity between Apple devices, while Android provides greater customization options and hardware variety. iPhone typically has better app optimization and longer software support, whereas Android phones often feature more advanced hardware specifications at lower price points. iPhone maintains stronger privacy controls and security features, but Android allows more flexibility in file management and default app selection.`
+            };
+
+            document.getElementById('inputText').value = templates[type] || '';
+            
+            // Auto-detect and suggest diagram type
+            setTimeout(() => {
+                if (selectedDiagramType === 'auto') {
+                    const suggestion = detectBestDiagramType(templates[type]);
+                    showAISuggestion(suggestion);
+                }
+            }, 500);
+        }
+
+        // Auto-convert on Ctrl+Enter
+        document.getElementById('inputText').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                generateDiagram();
+            }
+        });
+    </script>
+</body>
+</html>
